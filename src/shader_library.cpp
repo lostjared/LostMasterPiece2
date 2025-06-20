@@ -3,7 +3,8 @@
 
 namespace shader {
 
-    const char *vertex_shader = R"(#version 330 core
+    const char *vertex_shader = R"(#version 300 es
+            precision highp float;
             layout (location = 0) in vec3 aPos;
             layout (location = 1) in vec2 aTexCoord;
             out vec2 tc;
@@ -28,7 +29,12 @@ namespace shader {
         std::ostringstream stream;
         stream << input_file.rdbuf();
         fragment_text = stream.str();
-        
+#ifdef __EMSCRIPTEN__
+        size_t pos = fragment_text.find("#version 330 core");
+        if (pos != std::string::npos) {
+            fragment_text.replace(pos, 17, "#version 300 es\nprecision highp float;\n");
+        }
+#endif
         if(fragment_text.empty() || !program.loadProgramFromText(vertex_shader, fragment_text)) {
             std::cerr << "Could not load shader: " + filename_;
             return;

@@ -380,6 +380,7 @@ public:
                         mp.grid.game_piece.moveDown();
                     break;
                     case SDLK_SPACE:
+                    
                         mp.grid.game_piece.shiftDirection();
                         win->console.print("Shift Direction\n");
                     break;
@@ -623,17 +624,40 @@ void GameOver::event(gl::GLWindow *win, SDL_Event &e) {
     }
 }
 
+
+class Startup : public gl::GLObject {
+public:
+    virtual void load(gl::GLWindow *win) override {
+        font.loadFont(win->util.getFilePath("data/font.ttf"), 24);
+        counter = 0;
+    }
+    virtual void draw(gl::GLWindow *win) override {
+        win->text.printText_Solid(font, 25.0f, 25.0f, "Loading shaders...");
+        counter++;
+        if(counter == 2) {
+            library.reset(new shader::Library(win->util.getFilePath("data")));
+            win->setObject(new Intro());
+            win->object->load(win);
+            return;
+        }
+    }   
+    virtual void event(gl::GLWindow *win, SDL_Event &e) override {}
+private:
+    mx::Font font;
+    int counter = 0;
+};
+
 class MainWindow : public gl::GLWindow {
 public:
     MainWindow(const std::string &path, int wx, int wy) : gl::GLWindow("MasterPiece3D", wx, wy) {
         setPath(path);
-        library.reset(new shader::Library(util.getFilePath("data")));
+        swap();
         SDL_Surface *ico = png::LoadPNG(util.getFilePath("data/punk.png").c_str());
         if(ico != nullptr) {
             setWindowIcon(ico);
             SDL_FreeSurface(ico);
         }
-        setObject(new Intro());
+        setObject(new Startup());
         object->load(this);
         activateConsole(util.getFilePath("data/font.ttf"),16,{255,255,255});
         console.hide();
@@ -656,8 +680,7 @@ public:
             }
         } 
 #endif
-    }
-    
+    }   
 };
 
 MainWindow *main_w = nullptr;
