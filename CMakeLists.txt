@@ -33,6 +33,7 @@ add_executable(LostMasterPiece2
     src/intro.cpp
     src/quadtris.cpp
     src/start.cpp
+    src/shader_library.cpp
 )
 
 target_include_directories(LostMasterPiece2 PRIVATE
