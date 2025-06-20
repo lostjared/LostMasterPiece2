@@ -647,6 +647,8 @@ public:
         } 
 #endif
     }
+
+    
 };
 
 MainWindow *main_w = nullptr;
