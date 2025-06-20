@@ -4,21 +4,25 @@
 #include <iostream>
 #include "mx.hpp"
 #include "gl.hpp"
+#include "shader_library.hpp"
 
 class Intro : public gl::GLObject {
 public:
     Intro() {}
     virtual void load(gl::GLWindow *win) override {
-        load_shader();
+        int index = mx::generateRandomInt(0, 10);
+        std::cout << "Loading...: " << library->getShader(index)->filename << "\n";
+        gl::ShaderProgram &prog = library->getShader(index)->shader();
+        setShader(&prog);
+        program->useProgram();
         intro.initSize(win->w, win->h);
-        intro.loadTexture(&program, win->util.getFilePath("data/intro.png"), 0.0f, 0.0f, win->w, win->h);
-        win->console.print("Intro loaded\n");
+        intro.loadTexture(program, win->util.getFilePath("data/intro.png"), 0.0f, 0.0f, win->w, win->h);
     }
-    void load_shader();
+    void setShader(gl::ShaderProgram *shader) { program = shader; }
     virtual void event(gl::GLWindow *win, SDL_Event &e) override;
     virtual void draw(gl::GLWindow *win) override;
 private:
-    gl::ShaderProgram program;
+    gl::ShaderProgram *program;
     gl::GLSprite intro;
     Uint32 lastUpdateTime = 0;
     float fade = 1.0f;

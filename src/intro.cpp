@@ -74,9 +74,3 @@
         }
     )";
 #endif
-
-void Intro::load_shader() {
-    if(!program.loadProgramFromText(vSource, fSource)) {
-        throw mx::Exception("Failed to load shader program Intro::load_shader()");
-    }
-}

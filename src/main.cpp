@@ -12,6 +12,9 @@
 #if defined(__APPLE__) || defined(_WIN32) || defined(__linux__)
 #include"argz.hpp"
 #endif
+#include"shader_library.hpp"
+
+std::unique_ptr<shader::Library> library;
 
 #if defined(__EMSCRIPTEN__) || defined(__ANDORID__)
     const char *m_vSource = R"(#version 300 es
@@ -204,7 +207,7 @@ public:
             }
             textures.push_back(tex);
         }
-        background.loadProgramFromText(m_vSource,m_fSource);
+        background = library->getShader(0)->shader();
         bg.initSize(win->w, win->h);
         bg.loadTexture(&background, win->util.getFilePath("data/bg.png"), 0.0f, 0.0f, win->w, win->h);
         font.loadFont(win->util.getFilePath("data/font.ttf"), 24);
@@ -244,7 +247,10 @@ public:
         glEnable(GL_BLEND); 
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         background.useProgram();
-        background.setUniform("alpha", fade); 
+        background.silent(true);
+        glUniform2f(glGetUniformLocation(background.id(), "iResolution"), win->w, win->h);
+        background.setUniform("alpha", fade);
+        background.setUniform("time_f", SDL_GetTicks() / 1000.0f); 
         bg.initSize(win->w, win->h);
         bg.draw();
         glDisable(GL_BLEND); 
@@ -353,7 +359,12 @@ public:
                     win->console.process_message_queue();  
                 }
             break;
-            case SDL_KEYDOWN:
+            case SDL_KEYDOWN: {
+
+                int index = mx::generateRandomInt(0, library->size() - 1);
+                std::cout << "Loaded: " << library->getShader(index)->filename << std::endl;
+                background = library->getShader(index)->shader();
+
                 switch(e.key.keysym.sym) {
                     case SDLK_LEFT:
                         mp.grid.game_piece.moveLeft();
@@ -408,6 +419,7 @@ public:
                     //std::cout << "ZOOM: " << zoom << " X,Y,Z" << rotateX << "," << rotateY << "," << rotateZ << std::endl;
                     break;
                 }
+            }
                 break;
                 case SDL_MOUSEBUTTONDOWN:
                 case SDL_FINGERDOWN:
@@ -540,9 +552,11 @@ void Intro::draw(gl::GLWindow *win) {
 #else
     double currentTime = emscripten_get_now();
 #endif
-    program.useProgram();
-    program.setUniform("alpha", fade);
-    program.setUniform("time_f", SDL_GetTicks() / 1000.0f);
+    program->useProgram();
+    program->silent(true);
+    glUniform2f(glGetUniformLocation(program->id(), "iResolution"), win->w, win->h);
+    program->setUniform("alpha", fade);
+    program->setUniform("time_f", SDL_GetTicks() / 1000.0f);
     intro.draw();
     if((currentTime - lastUpdateTime) > 25) {
         lastUpdateTime = currentTime;
@@ -560,11 +574,6 @@ void Start::setGame(gl::GLWindow *win) {
     win->object->load(win);
 }
 
-void Start::load_shader() {
-    if(!program.loadProgramFromText(m_vSource, m_fSource)) {
-        throw mx::Exception("Failed to load shader program Intro::load_shader()");
-    }
-}
 
 void Start::event(gl::GLWindow *win, SDL_Event &e) {
     if(fade_in == true && (e.type == SDL_KEYDOWN || e.type == SDL_FINGERUP || e.type == SDL_MOUSEBUTTONUP)) {
@@ -617,7 +626,8 @@ void GameOver::event(gl::GLWindow *win, SDL_Event &e) {
 class MainWindow : public gl::GLWindow {
 public:
     MainWindow(const std::string &path, int wx, int wy) : gl::GLWindow("MasterPiece3D", wx, wy) {
-        setPath(std::filesystem::current_path().string()+"/"+path);
+        setPath(path);
+        library.reset(new shader::Library(util.getFilePath("data")));
         SDL_Surface *ico = png::LoadPNG(util.getFilePath("data/punk.png").c_str());
         if(ico != nullptr) {
             setWindowIcon(ico);
@@ -647,7 +657,6 @@ public:
         } 
 #endif
     }
-
     
 };
 

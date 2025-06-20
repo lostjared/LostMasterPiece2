@@ -18,19 +18,28 @@ namespace shader {
     }
 
     void Shader::load_shader(const std::string &filename_) {
-        std::ifstream fin(filename_);
-        if(!fin.is_open()) 
-            throw mx::Exception("Error could not open shader: " + filename_);
+        std::fstream input_file;
+        input_file.open(filename_, std::ios::in);
+        if(!input_file.is_open()) {
+            std::cerr << "Error opening: " << filename_ << "\n";
+            return;
+        }
 
         std::ostringstream stream;
-        stream << fin.rdbuf();
+        stream << input_file.rdbuf();
         fragment_text = stream.str();
+        
+        if(fragment_text.empty() || !program.loadProgramFromText(vertex_shader, fragment_text)) {
+            std::cerr << "Could not load shader: " + filename_;
+            return;
+        }
+        
+        std::cout << "Loaded: " << filename_ << "\n";
+        opened_ = true;
+    }
 
-       if(!program.loadProgramFromText(vertex_shader, fragment_text)) {
-            throw mx::Exception("Error could not load shader: " + filename_);
-       }
-       fin.close();
-       std::cout << "Loaded " << filename_ << "\n";
+    bool Shader::opened() const {
+        return opened_;
     }
 
     Library::Library(const std::string &filename_index) {
@@ -38,14 +47,23 @@ namespace shader {
     }
 
     void Library::load_library(const std::string &filename_index) {
-        std::ifstream fin(filename_index);
-        if(!fin.is_open()) {
-            throw mx::Exception("Could not open library index file: " + filename_index);
+        std::fstream file;
+        file.open(filename_index+"/gfx/index.txt", std::ios::in);
+        if(!file.is_open()) {
+            std::cerr << "Error opening filen index.txt\n";
         }
         std::string line;
-        while(std::getline(fin, line)) {
-            shaders.push_back(std::make_unique<Shader>(line));
+        while(std::getline(file, line)) {
+            auto pos = line.find("\r");
+            if(pos != std::string::npos)
+                line = line.substr(0, pos);
+
+            auto it = std::make_unique<Shader>(filename_index+"/gfx/"+line);
+            if(it && it->opened()) {
+                shaders.push_back(std::move(it));
+            }
+
         }
-        std::cout << "Loaded " << shaders.size() << " shaders..\n";
+        std::cout << "Loaded: " << shaders.size() << " shaders\n";
     }
 }
