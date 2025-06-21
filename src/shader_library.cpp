@@ -2,7 +2,7 @@
 #include<sstream>
 
 namespace shader {
-
+#ifdef __EMSCRIPTEN__
     const char *vertex_shader = R"(#version 300 es
             precision highp float;
             layout (location = 0) in vec3 aPos;
@@ -13,6 +13,17 @@ namespace shader {
                 tc = aTexCoord;         
             }
     )";
+#else
+    const char *vertex_shader = R"(#version 330 core
+            layout (location = 0) in vec3 aPos;
+            layout (location = 1) in vec2 aTexCoord;
+            out vec2 tc;
+            void main() {
+                gl_Position = vec4(aPos, 1.0); 
+                tc = aTexCoord;         
+            }
+    )";
+#endif
         
     Shader::Shader(const std::string &filename_) : filename(filename_) {
         load_shader(filename_);
