@@ -1,5 +1,11 @@
 # LostMasterPiece2
 
+![Screenshot 2025-06-21 010930](https://github.com/user-attachments/assets/32f4d5b5-1b04-4377-bfa0-14e864667d85)
+
+![Screenshot 2025-06-21 010948](https://github.com/user-attachments/assets/80b7d6f0-4502-4f7f-b90f-c369bd60df44)
+
+![Screenshot 2025-06-21 011000](https://github.com/user-attachments/assets/2176dc56-470b-40e4-88c9-b45f542eae85)
+
 A 3D puzzle game inspired by Tetris with dynamic visual effects and shader-based backgrounds.
 
 ## Overview
