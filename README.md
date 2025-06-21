@@ -8,6 +8,8 @@
 
 A 3D puzzle game inspired by Tetris with dynamic visual effects and shader-based backgrounds.
 
+Test it online here: https://lostsidedead.biz/LostMasterPiece2
+
 ## Overview
 
 LostMasterPiece2 is a modern take on the classic block-falling puzzle game, featuring:
