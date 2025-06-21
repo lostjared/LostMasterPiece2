@@ -425,6 +425,10 @@ public:
                 case SDL_MOUSEBUTTONDOWN:
                 case SDL_FINGERDOWN:
                 {
+                     int index = mx::generateRandomInt(0, library->size() - 1);
+                     std::cout << "Loaded: " << library->getShader(index)->filename << std::endl;
+                     background = library->getShader(index)->shader();
+
                     int x, y;
                     if (e.type == SDL_MOUSEBUTTONDOWN) {
                         x = e.button.x;
