@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LostMasterPiece2 - 3D Tetris with Dynamic Shaders</title>
+    
+    <!-- Facebook Open Graph Meta Tags -->
+    <meta property="og:title" content="LostMasterPiece2 - 3D Tetris with Dynamic Shaders">
+    <meta property="og:description" content="Experience the ultimate 3D puzzle game with over 500 mesmerizing shader effects! Classic Tetris gameplay meets cutting-edge visual art in this stunning browser game.">
+    <meta property="og:image" content="https://lostsidedead.biz/LostMasterPiece2/effect1.jpg">
+    <meta property="og:url" content="https://lostsidedead.biz/LostMasterPiece2">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="LostMasterPiece2">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
+            color: #ffffff;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(45deg, #cc0000, #ff3333);
+            padding: 2rem 0;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(204, 0, 0, 0.3);
+        }
+
+        .title {
+            font-size: 3.5rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.9;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        /* Navigation */
+        nav {
+            background: rgba(0, 0, 0, 0.8);
+            padding: 1rem 0;
+            backdrop-filter: blur(10px);
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: #ffffff;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        nav a:hover {
+            background: #cc0000;
+            border-color: #ff3333;
+            transform: translateY(-2px);
+        }
+
+        /* Main Content */
+        main {
+            padding: 3rem 0;
+        }
+
+        .section {
+            margin-bottom: 4rem;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(204, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+        }
+
+        .section h2 {
+            font-size: 2.2rem;
+            color: #ff3333;
+            margin-bottom: 1.5rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.7);
+        }
+
+        .section h3 {
+            font-size: 1.5rem;
+            color: #ff6666;
+            margin: 1.5rem 0 1rem 0;
+        }
+
+        /* Game Screenshots */
+        .screenshots {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .screenshot {
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(204, 0, 0, 0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .screenshot:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 35px rgba(204, 0, 0, 0.4);
+        }
+
+        .screenshot img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border: 2px solid #cc0000;
+        }
+
+        /* Controls Grid */
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .control-section {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border: 1px solid #cc0000;
+        }
+
+        .control-section h4 {
+            color: #ff3333;
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        .control-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            padding: 0.3rem 0;
+        }
+
+        .key {
+            background: #cc0000;
+            color: white;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-weight: bold;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        /* Features List */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .feature {
+            background: rgba(204, 0, 0, 0.1);
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid #cc0000;
+            transition: transform 0.3s ease;
+        }
+
+        .feature:hover {
+            transform: translateX(10px);
+        }
+
+        .feature h4 {
+            color: #ff3333;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Play Button */
+        .play-button {
+            text-align: center;
+            margin: 3rem 0;
+        }
+
+        .play-btn {
+            display: inline-block;
+            background: linear-gradient(45deg, #cc0000, #ff3333);
+            color: white;
+            padding: 1rem 3rem;
+            font-size: 1.3rem;
+            text-decoration: none;
+            border-radius: 50px;
+            box-shadow: 0 6px 20px rgba(204, 0, 0, 0.4);
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .play-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(204, 0, 0, 0.6);
+            background: linear-gradient(45deg, #ff3333, #ff6666);
+        }
+
+        /* Footer */
+        footer {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 2rem 0;
+            text-align: center;
+            border-top: 2px solid #cc0000;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2.5rem;
+            }
+            
+            nav ul {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .controls-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Animations */
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(204, 0, 0, 0.3); }
+            50% { box-shadow: 0 0 30px rgba(204, 0, 0, 0.6); }
+        }
+
+        .section {
+            animation: glow 3s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1 class="title">LostMasterPiece2</h1>
+            <p class="subtitle">3D Puzzle with Dynamic Shader Effects</p>
+        </div>
+    </header>
+
+    <nav>
+        <div class="container">
+            <ul>
+                <li><a href="#gameplay">Gameplay</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#controls">Controls</a></li>
+                <li><a href="#shaders">Shaders</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        <div class="container">
+            <div class="play-button">
+                <a href="https://lostsidedead.biz/LostMasterPiece2" class="play-btn">Play Now Online</a>
+            </div>
+
+            <div class="screenshots">
+                <div class="screenshot">
+                    <img src="effect1.jpg" alt="LostMasterPiece2 Gameplay Screenshot 1" />
+                </div>
+                <div class="screenshot">
+                    <img src="effect2.jpg" alt="LostMasterPiece2 Shader Effects Screenshot 2" />
+                </div>
+                <div class="screenshot">
+                    <img src="effect3.jpg" alt="LostMasterPiece2 3D View Screenshot 3" />
+                </div>
+            </div>
+
+            <section id="gameplay" class="section">
+                <h2>🎮 How to Play</h2>
+                <p>LostMasterPiece2 is a modern 3D take on the classic Tetris puzzle game with stunning visual effects!</p>
+                
+                <h3>Basic Gameplay</h3>
+                <div class="features">
+                    <div class="feature">
+                        <h4>🧩 Block Falling</h4>
+                        <p>Colored 3D blocks fall from the top of the game grid. Position them strategically to create complete rows.</p>
+                    </div>
+                    <div class="feature">
+                        <h4>🎯 Line Clearing</h4>
+                        <p>Complete horizontal rows to clear them and earn points. The more rows you clear at once, the higher your score!</p>
+                    </div>
+                    <div class="feature">
+                        <h4>⚡ Increasing Speed</h4>
+                        <p>As your level increases, blocks fall faster. Stay focused and plan your moves carefully!</p>
+                    </div>
+                    <div class="feature">
+                        <h4>🏆 High Score</h4>
+                        <p>Try to achieve the highest score possible before the blocks reach the top of the grid!</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="features" class="section">
+                <h2>✨ Unique Features</h2>
+                <div class="features">
+                    <div class="feature">
+                        <h4>🎨 Dynamic Shader Backgrounds</h4>
+                        <p>Every keypress or touch randomly selects from 500+ mesmerizing shader effects including kaleidoscopes, rainbows, glitch effects, and psychedelic patterns.</p>
+                    </div>
+                    <div class="feature">
+                        <h4>🎮 3D Perspective</h4>
+                        <p>Rotate the camera around the game grid using WASD keys. Zoom in and out to get the perfect view of your strategy.</p>
+                    </div>
+                    <div class="feature">
+                        <h4>💡 Realistic Lighting</h4>
+                        <p>All game pieces are rendered as textured 3D cubes with Phong lighting for stunning visual depth.</p>
+                    </div>
+                    <div class="feature">
+                        <h4>📱 Cross-Platform</h4>
+                        <p>Play on desktop, web browsers, or mobile devices with optimized touch controls.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="controls" class="section">
+                <h2>🎮 Controls</h2>
+                <div class="controls-grid">
+                    <div class="control-section">
+                        <h4>🎯 Game Controls</h4>
+                        <div class="control-item">
+                            <span>Move Left/Right</span>
+                            <span class="key">← →</span>
+                        </div>
+                        <div class="control-item">
+                            <span>Move Down</span>
+                            <span class="key">↓</span>
+                        </div>
+                        <div class="control-item">
+                            <span>Shift Colors</span>
+                            <span class="key">↑</span>
+                        </div>
+                        <div class="control-item">
+                            <span>Rotate Direction</span>
+                            <span class="key">SPACE</span>
+                        </div>
+                        <div class="control-item">
+                            <span>Drop Instantly</span>
+                            <span class="key">ENTER</span>
+                        </div>
+                    </div>
+
+                    <div class="control-section">
+                        <h4>📷 Camera Controls</h4>
+                        <div class="control-item">
+                            <span>Rotate View</span>
+                            <span class="key">WASD</span>
+                        </div>
+                        <div class="control-item">
+                            <span>Zoom In/Out</span>
+                            <span class="key">+ / -</span>
+                        </div>
+                        <div class="control-item">
+                            <span>Z-Axis Rotation</span>
+                            <span class="key">Z / X</span>
+                        </div>
+                    </div>
+
+                    <div class="control-section">
+                        <h4>📱 Touch Controls</h4>
+                        <div class="control-item">
+                            <span>Change Shader</span>
+                            <span class="key">TAP</span>
+                        </div>
+                        <div class="control-item">
+                            <span>Shift Colors</span>
+                            <span class="key">SWIPE ↑</span>
+                        </div>
+                        <div class="control-item">
+                            <span>Change Direction</span>
+                            <span class="key">SWIPE ↓</span>
+                        </div>
+                        <div class="control-item">
+                            <span>Move Piece</span>
+                            <span class="key">SWIPE ←→</span>
+                        </div>
+                        <div class="control-item">
+                            <span>Drop Instantly</span>
+                            <span class="key">2-FINGER</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="shaders" class="section">
+                <h2>🌈 Shader System</h2>
+                <p>The most unique feature of LostMasterPiece2 is its dynamic shader background system that transforms your gaming experience into a visual art show!</p>
+                
+                <h3>Available Effects Include:</h3>
+                <div class="features">
+                    <div class="feature">
+                        <h4>🔮 Kaleidoscopic Patterns</h4>
+                        <p>Mesmerizing symmetrical designs that shift and evolve</p>
+                    </div>
+                    <div class="feature">
+                        <h4>🌈 Rainbow Spirals</h4>
+                        <p>Colorful vortexes and gradient animations</p>
+                    </div>
+                    <div class="feature">
+                        <h4>⚡ Glitch Effects</h4>
+                        <p>Digital distortions and VHS-style artifacts</p>
+                    </div>
+                    <div class="feature">
+                        <h4>🌊 Wave Animations</h4>
+                        <p>Fluid plasma and water-like movements</p>
+                    </div>
+                    <div class="feature">
+                        <h4>💎 Crystal Effects</h4>
+                        <p>Prismatic refractions and mirror distortions</p>
+                    </div>
+                    <div class="feature">
+                        <h4>🎆 Psychedelic Transforms</h4>
+                        <p>Mind-bending color manipulations and XOR operations</p>
+                    </div>
+                </div>
+
+                <h3>How It Works</h3>
+                <p>Every time you press a key or tap the screen, the game randomly selects from over 500 different fragment shaders, creating a unique visual experience every time you play. The shaders react to game time, creating constantly evolving backgrounds that never get boring!</p>
+            </section>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 LostSideDead Software - Where Classic Puzzle Gaming Meets Modern Visual Art</p>
+            <p>Experience the fusion of traditional gameplay with cutting-edge shader technology</p>
+        </div>
+    </footer>
+</body>
+</html>
