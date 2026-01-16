@@ -3,7 +3,7 @@
 void Start::draw(gl::GLWindow *win) {
     glDisable(GL_DEPTH_TEST);
     program->useProgram();
-    program->silent(true);
+    program->setSilent(true);
     glUniform2f(glGetUniformLocation(program->id(), "iResolution"), win->w, win->h);
     program->setUniform("alpha", fade);
     program->setUniform("time_f", SDL_GetTicks() / 1000.0f);

@@ -247,7 +247,7 @@ public:
         glEnable(GL_BLEND); 
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         background.useProgram();
-        background.silent(true);
+        background.setSilent(true);
         glUniform2f(glGetUniformLocation(background.id(), "iResolution"), win->w, win->h);
         background.setUniform("alpha", fade);
         background.setUniform("time_f", SDL_GetTicks() / 1000.0f); 
@@ -558,7 +558,7 @@ void Intro::draw(gl::GLWindow *win) {
     double currentTime = emscripten_get_now();
 #endif
     program->useProgram();
-    program->silent(true);
+    program->setSilent(true);
     glUniform2f(glGetUniformLocation(program->id(), "iResolution"), win->w, win->h);
     program->setUniform("alpha", fade);
     program->setUniform("time_f", SDL_GetTicks() / 1000.0f);
